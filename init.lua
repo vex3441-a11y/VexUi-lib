@@ -1,8 +1,10 @@
---// VexUI Library - Core
---// Mobile Safe + Smooth Animations
+--// VexUI Library - Init.lua Full Build
+--// Window + Animations + Drag (Mobile + PC)
+--// Mobile safe, TweenService-based, minimal crash risk
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
 local VexUI = {}
@@ -40,7 +42,7 @@ function VexUI:CreateWindow(config)
     stroke.Transparency = 0.6
     stroke.Parent = main
 
-    -- UIScale (animação segura)
+    -- UIScale (animation safe)
     local scale = Instance.new("UIScale")
     scale.Scale = 0.92
     scale.Parent = main
@@ -76,42 +78,93 @@ function VexUI:CreateWindow(config)
     title.TextTransparency = 1
     title.Parent = top
 
-    --// ANIMAÇÕES
-
-    -- Fade + Glass
+    --// ANIMAÇÕES DE ENTRADA
     TweenService:Create(
         main,
         TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
         {BackgroundTransparency = 0.15}
     ):Play()
 
-    -- Scale pop
     TweenService:Create(
         scale,
         TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
         {Scale = 1}
     ):Play()
 
-    -- Icon fade
     TweenService:Create(
         icon,
         TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {ImageTransparency = 0}
     ):Play()
 
-    -- Title fade
     TweenService:Create(
         title,
         TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
         {TextTransparency = 0}
     ):Play()
 
-    -- Stroke pulse (leve, sem loop manual)
     TweenService:Create(
         stroke,
         TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true),
         {Transparency = 0.3}
     ):Play()
+
+    --// DRAG SYSTEM (mobile + PC)
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    top.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+
+            -- small "lift" animation
+            TweenService:Create(
+                scale,
+                TweenInfo.new(0.15, Enum.EasingStyle.Quad),
+                {Scale = 1.02}
+            ):Play()
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+
+                    TweenService:Create(
+                        scale,
+                        TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+                        {Scale = 1}
+                    ):Play()
+                end
+            end)
+        end
+    end)
+
+    top.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
 
     return main
 end
