@@ -1,5 +1,5 @@
---// VexUI Library - Final Visual Test Build v1.2
---// Window + Tabs + Button/Toggle/Slider + Profile Panel + Mobile Shortcut
+--// VexUI Library - Ultra Polished Test Build v1.3
+--// Window + Tabs + Button/Toggle/Slider + Rounded Profile + Transparent Shortcut
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -175,7 +175,7 @@ function VexUI:CreateWindow(config)
             toggle.TextColor3=Color3.fromRGB(255,255,255)
             toggle.Parent=page
             local corner = Instance.new("UICorner", toggle)
-            corner.CornerRadius=UDim.new(0,10)
+            corner.CornerRadius = UDim.new(0,10)
             local state=false
             toggle.MouseButton1Click:Connect(function()
                 state=not state
@@ -193,7 +193,7 @@ function VexUI:CreateWindow(config)
             sliderFrame.BackgroundColor3 = Color3.fromRGB(35,35,40)
             sliderFrame.Parent=page
             local corner = Instance.new("UICorner", sliderFrame)
-            corner.CornerRadius=UDim.new(0,10)
+            corner.CornerRadius = UDim.new(0,10)
             local bar = Instance.new("Frame", sliderFrame)
             bar.Size=UDim2.new(0,0,1,0)
             bar.BackgroundColor3=Color3.fromRGB(120,40,255)
@@ -201,8 +201,8 @@ function VexUI:CreateWindow(config)
             label.Text=txt.." 0"
             label.Size=UDim2.new(1,0,1,0)
             label.TextColor3=Color3.fromRGB(255,255,255)
-            label.BackgroundTransparency=1
-            label.TextScaled=true
+            label.BackgroundTransparency = 1
+            label.TextScaled = true
             local dragging=false
             sliderFrame.InputBegan:Connect(function(input)
                 if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true end
@@ -225,20 +225,20 @@ function VexUI:CreateWindow(config)
         return page
     end
 
-    -- Profile panel (avatar real, bottom-left)
+    -- Profile panel (avatar real, bottom-left, redondo)
     local profile = Instance.new("Frame", main)
     profile.Size=UDim2.fromOffset(160,60)
     profile.Position=UDim2.fromScale(0,1)
     profile.AnchorPoint=Vector2.new(0,1)
-    profile.BackgroundColor3 = Color3.fromRGB(25,25,30)
-    local cornerP = Instance.new("UICorner",profile)
-    cornerP.CornerRadius=UDim.new(0,12)
+    profile.BackgroundTransparency = 1
 
     local avatar = Instance.new("ImageLabel", profile)
     avatar.Size = UDim2.fromOffset(50,50)
     avatar.Position = UDim2.fromOffset(5,5)
     avatar.BackgroundTransparency = 1
     avatar.Image = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    local cornerAvatar = Instance.new("UICorner", avatar)
+    cornerAvatar.CornerRadius = UDim.new(0,50)
 
     local labelP = Instance.new("TextLabel",profile)
     labelP.Text = Player.Name
@@ -249,12 +249,12 @@ function VexUI:CreateWindow(config)
     labelP.TextScaled = true
     labelP.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Mobile Shortcut (top-center)
+    -- Mobile Shortcut (top-center, transparente)
     local shortcut = Instance.new("ImageButton", gui)
     shortcut.Size=UDim2.fromOffset(50,50)
     shortcut.Position=UDim2.new(0.5, -25, 0, 20)
     shortcut.AnchorPoint=Vector2.new(0.5,0)
-    shortcut.BackgroundTransparency=0.15
+    shortcut.BackgroundTransparency=1
     shortcut.Image="rbxassetid://71194548478826"
     local cornerS = Instance.new("UICorner", shortcut)
     cornerS.CornerRadius = UDim.new(0,12)
