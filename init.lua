@@ -1,4 +1,4 @@
---// VexUI Library - Full Visual Test Build v1.1
+--// VexUI Library - Final Visual Test Build v1.2
 --// Window + Tabs + Button/Toggle/Slider + Profile Panel + Mobile Shortcut
 
 local TweenService = game:GetService("TweenService")
@@ -146,14 +146,13 @@ function VexUI:CreateWindow(config)
             btn.Size=UDim2.new(0,180,0,36)
             btn.Position=UDim2.fromOffset(10,10+36*#page.Components:GetChildren())
             btn.BackgroundColor3 = Color3.fromRGB(35,35,40)
-            btn.BackgroundTransparency=0
-            local corner = Instance.new("UICorner", btn)
-            corner.CornerRadius=UDim.new(0,10)
             btn.Text=txt
             btn.Font=Enum.Font.GothamBold
             btn.TextSize=14
             btn.TextColor3=Color3.fromRGB(255,255,255)
             btn.Parent=page
+            local corner = Instance.new("UICorner", btn)
+            corner.CornerRadius = UDim.new(0,10)
             btn.MouseEnter:Connect(function()
                 TweenService:Create(btn,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(50,50,60)}):Play()
             end)
@@ -226,29 +225,39 @@ function VexUI:CreateWindow(config)
         return page
     end
 
-    -- Profile panel (inside hub, bottom-left)
+    -- Profile panel (avatar real, bottom-left)
     local profile = Instance.new("Frame", main)
     profile.Size=UDim2.fromOffset(160,60)
     profile.Position=UDim2.fromScale(0,1)
     profile.AnchorPoint=Vector2.new(0,1)
     profile.BackgroundColor3 = Color3.fromRGB(25,25,30)
-    profile.BackgroundTransparency = 0
     local cornerP = Instance.new("UICorner",profile)
     cornerP.CornerRadius=UDim.new(0,12)
+
+    local avatar = Instance.new("ImageLabel", profile)
+    avatar.Size = UDim2.fromOffset(50,50)
+    avatar.Position = UDim2.fromOffset(5,5)
+    avatar.BackgroundTransparency = 1
+    avatar.Image = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+
     local labelP = Instance.new("TextLabel",profile)
     labelP.Text = Player.Name
-    labelP.Size = UDim2.new(1,0,1,0)
+    labelP.Position = UDim2.fromOffset(60,5)
+    labelP.Size = UDim2.new(1,-60,1,0)
     labelP.BackgroundTransparency = 1
     labelP.TextColor3 = Color3.fromRGB(255,255,255)
     labelP.TextScaled = true
+    labelP.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Mobile Shortcut (top of screen)
+    -- Mobile Shortcut (top-center)
     local shortcut = Instance.new("ImageButton", gui)
     shortcut.Size=UDim2.fromOffset(50,50)
     shortcut.Position=UDim2.new(0.5, -25, 0, 20)
     shortcut.AnchorPoint=Vector2.new(0.5,0)
     shortcut.BackgroundTransparency=0.15
     shortcut.Image="rbxassetid://71194548478826"
+    local cornerS = Instance.new("UICorner", shortcut)
+    cornerS.CornerRadius = UDim.new(0,12)
     local draggingShortcut=false
     local startPos
     local dragStart
