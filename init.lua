@@ -1,6 +1,5 @@
---// VexUI Library - Init.lua Full Build
---// Window + Animations + Drag (Mobile + PC)
---// Mobile safe, TweenService-based, minimal crash risk
+--// VexUI Library - Full Build with Animated Tabs
+--// Window + Drag + Animated Tabs (Mobile + PC)
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -30,12 +29,11 @@ function VexUI:CreateWindow(config)
     main.BackgroundTransparency = 1
     main.Parent = gui
 
-    -- Corner
+    -- Corner & Stroke
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 18)
     corner.Parent = main
 
-    -- Stroke
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(120, 40, 255)
     stroke.Thickness = 1
@@ -78,7 +76,23 @@ function VexUI:CreateWindow(config)
     title.TextTransparency = 1
     title.Parent = top
 
-    --// ANIMAÇÕES DE ENTRADA
+    -- Tabs container (left side)
+    local tabsFrame = Instance.new("Frame")
+    tabsFrame.Name = "Tabs"
+    tabsFrame.Size = UDim2.new(0, 120, 1, -48)
+    tabsFrame.Position = UDim2.fromOffset(0, 48)
+    tabsFrame.BackgroundTransparency = 1
+    tabsFrame.Parent = main
+
+    -- Pages container (right side)
+    local pagesFrame = Instance.new("Frame")
+    pagesFrame.Name = "Pages"
+    pagesFrame.Size = UDim2.new(1, -120, 1, -48)
+    pagesFrame.Position = UDim2.fromOffset(120, 48)
+    pagesFrame.BackgroundTransparency = 1
+    pagesFrame.Parent = main
+
+    -- Animations for window entry
     TweenService:Create(
         main,
         TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
@@ -109,7 +123,7 @@ function VexUI:CreateWindow(config)
         {Transparency = 0.3}
     ):Play()
 
-    --// DRAG SYSTEM (mobile + PC)
+    -- Drag system
     local dragging = false
     local dragInput
     local dragStart
@@ -126,13 +140,12 @@ function VexUI:CreateWindow(config)
     end
 
     top.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = main.Position
 
-            -- small "lift" animation
+            -- small lift
             TweenService:Create(
                 scale,
                 TweenInfo.new(0.15, Enum.EasingStyle.Quad),
@@ -142,7 +155,6 @@ function VexUI:CreateWindow(config)
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-
                     TweenService:Create(
                         scale,
                         TweenInfo.new(0.2, Enum.EasingStyle.Quad),
@@ -154,8 +166,7 @@ function VexUI:CreateWindow(config)
     end)
 
     top.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
@@ -166,7 +177,46 @@ function VexUI:CreateWindow(config)
         end
     end)
 
-    return main
+    -- Tab system
+    local function createTab(name)
+        local tabButton = Instance.new("TextButton")
+        tabButton.Size = UDim2.new(1, 0, 0, 36)
+        tabButton.BackgroundTransparency = 0.8
+        tabButton.Text = name
+        tabButton.Font = Enum.Font.GothamBold
+        tabButton.TextSize = 14
+        tabButton.TextColor3 = Color3.fromRGB(230, 230, 230)
+        tabButton.Parent = tabsFrame
+
+        local page = Instance.new("Frame")
+        page.Size = UDim2.new(1, 0, 1, 0)
+        page.BackgroundTransparency = 1
+        page.Visible = false
+        page.Parent = pagesFrame
+
+        tabButton.MouseEnter:Connect(function()
+            TweenService:Create(tabButton, TweenInfo.new(0.15), {BackgroundTransparency = 0.6}):Play()
+        end)
+        tabButton.MouseLeave:Connect(function()
+            TweenService:Create(tabButton, TweenInfo.new(0.15), {BackgroundTransparency = 0.8}):Play()
+        end)
+
+        tabButton.MouseButton1Click:Connect(function()
+            for _, p in pairs(pagesFrame:GetChildren()) do
+                if p:IsA("Frame") then
+                    p.Visible = false
+                end
+            end
+            page.Visible = true
+        end)
+
+        return page
+    end
+
+    return {
+        Main = main,
+        CreateTab = createTab
+    }
 end
 
 return VexUI
